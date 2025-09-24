@@ -50,7 +50,7 @@ public class ScoreManager : MonoBehaviour
             }
             else
             {
-                // display win text
+                // display lose text
                 textbox.text = "You Lose!\n Press R to try Again!";
 
             }

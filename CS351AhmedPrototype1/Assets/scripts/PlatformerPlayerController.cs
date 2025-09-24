@@ -44,7 +44,7 @@ public class PlatformerPlayerController : MonoBehaviour
         // ensure the ground check variable is assigned
         if(groundCheck == null) 
         {
-            Debug.LogError("groundCheck not assigned to the player controller!!")
+            Debug.LogError("groundCheck not assigned to the player controller!!");
         }
 
 
@@ -59,7 +59,7 @@ public class PlatformerPlayerController : MonoBehaviour
         // check for jump input
         if(Input.GetButtonDown("Jump") && isGrounded) 
         {
-            rb.velocity = new Vector2(rb.velocity.x * moveSpeed, rb.velocity.y);
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
 
             
         }
@@ -70,10 +70,24 @@ public class PlatformerPlayerController : MonoBehaviour
 
     {
        
-        // player using Rigidbody2D
+        // player using Rigid body2D
         rb.velocity = new Vector2(horizontalInput * moveSpeed, rb.velocity.y);
 
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+
+        // optionally we can add animations here later
+
+        // ensure the player is facing the direction of movement
+
+        if(horizontalInput > 0)
+        {
+            transform.localScale = new Vector3(1f, 1f, 1f);
+        }
+        else if(horizontalInput < 0)
+        {
+            transform.localScale = new Vector3(-1f, 1f, 1f);
+        }
+
 
     }
 

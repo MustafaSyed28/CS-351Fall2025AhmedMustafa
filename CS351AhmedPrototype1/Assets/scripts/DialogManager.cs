@@ -14,8 +14,13 @@ public class DialogManager : MonoBehaviour
     private int index;
     public float typingSpeed;
 
+    public GameObject continueButton;
+    public GameObject dialogPanel;
+
+
     private void OnEnable()
     {
+        continueButton.SetActive(false);
         StartCoroutine(Type());
     }
 
@@ -28,19 +33,29 @@ public class DialogManager : MonoBehaviour
             textbox.text += letter;
             yield return new WaitForSeconds(typingSpeed);
         }
+
+        continueButton.SetActive(true);
+
+
     }
 
-
-
-    // Start is called before the first frame update
-    void Start()
+    public void NextSentence()
     {
-        
+        continueButton.SetActive(false);
+
+        if (index < sentences.Length -1)
+        {
+            index++;
+            textbox.text = "";
+            StartCoroutine(Type());
+        }
+        else
+        {
+            textbox.text = "";
+            dialogPanel.SetActive(false);
+
+        }
+
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

@@ -24,8 +24,6 @@ public class PlatformerPlayerController : MonoBehaviour
 
     public float groundCheckRadius = 0.2f;
 
-
-
     // refrence to Rigid body2D
     private Rigidbody2D rb;
 
@@ -34,9 +32,18 @@ public class PlatformerPlayerController : MonoBehaviour
     // a variable holds horizontal input
     private float horizontalInput;
 
+    // Set these referance in the inspector
+    public AudioClip jumpSound;
+
+    // An audio to play sound effects
+    private AudioSource playerAudio;
+
     // Start is called before the first frame update
     void Start()
     {
+
+        // set refrence
+        playerAudio = GetComponent<AudioSource>();
 
         // get values for horizontal movement
         rb = GetComponent<Rigidbody2D>();
@@ -60,6 +67,9 @@ public class PlatformerPlayerController : MonoBehaviour
         if(Input.GetButtonDown("Jump") && isGrounded) 
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+
+            // play jump soundEffect
+            playerAudio.PlayOneShot(jumpSound, 1.0f);
 
             
         }

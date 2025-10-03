@@ -6,18 +6,16 @@ using UnityEngine.Events;
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class TriggerRock : MonoBehaviour
 {
-    [Header("Loop")]
-    public Transform spawnPoint;             // If null, uses start position
-    public float resetDelay = 0.35f;         // Wait before rock resets
-    public float extraHeight = 0.0f;         // Add a bit of height on respawn if you want
-    public bool randomizeDelay = false;
-    public Vector2 randomDelayRange = new Vector2(0.2f, 0.8f);
+    [Header("Loop Settings")]
+    public Transform spawnPoint;          // leave empty to use the rock's start position
+    public float resetDelay = 0.35f;      // wait before rock resets after hitting ground
+    public float extraLift = 0.0f;        // add a tiny height when respawning (optional)
 
     [Header("Ground Detection")]
-    public LayerMask groundLayers;           // Assign "Ground" layer in Inspector
+    public LayerMask groundLayers;        // set to your Ground layer in Inspector
 
-    [Header("Events")]
-    public UnityEvent onHitPlayer;           // Drag any action (show text, respawn, etc.)
+    [Header("Optional: On player hit")]
+    public UnityEvent onHitPlayer;        // e.g., show text, play sound, etc.
 
     Rigidbody2D rb;
     Vector3 startPos;
@@ -26,25 +24,28 @@ public class TriggerRock : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        startPos = (spawnPoint != null) ? spawnPoint.position : transform.position;
+        startPos = (spawnPoint != null) ? (Vector3)spawnPoint.position : transform.position;
 
-        // Good defaults for a falling rock
-        rb.freezeRotation = true;            // keep circle upright
+        rb.freezeRotation = true;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
     }
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        // 1) If we hit the Player -> fire event immediately
+        // If we hit the player -> fire event and respawn the player
         if (collision.collider.CompareTag("Player"))
         {
             onHitPlayer?.Invoke();
-            // You can also reset the rock after hitting the player if desired:
+
+            var respawn = collision.collider.GetComponent<PlayerRespawn>();
+            if (respawn != null) respawn.Respawn();
+
+            // Optionally also reset the rock
             if (!resetting) StartCoroutine(ResetAfterDelay());
             return;
         }
 
-        // 2) If we hit the ground -> schedule a reset
+        // If we hit the ground layer -> schedule a reset
         if (IsInLayerMask(collision.collider.gameObject.layer, groundLayers))
         {
             if (!resetting) StartCoroutine(ResetAfterDelay());
@@ -54,26 +55,22 @@ public class TriggerRock : MonoBehaviour
     System.Collections.IEnumerator ResetAfterDelay()
     {
         resetting = true;
+        yield return new WaitForSeconds(resetDelay);
 
-        float wait = resetDelay;
-        if (randomizeDelay) wait = Random.Range(randomDelayRange.x, randomDelayRange.y);
-        yield return new WaitForSeconds(wait);
-
-        // Zero out physics and teleport back to spawn
+        // stop motion & teleport back to spawn
         rb.velocity = Vector2.zero;
         rb.angularVelocity = 0f;
 
-        Vector3 target = startPos + Vector3.up * extraHeight;
+        Vector3 target = startPos + Vector3.up * extraLift;
         transform.position = target;
 
-        // Nudge to ensure it leaves the platform cleanly (optional)
-        rb.Sleep();    // clear any residual contacts
+        // clean physics contacts and fall again
+        rb.Sleep();
         rb.WakeUp();
 
         resetting = false;
     }
 
-    // Utility: check if a layer is in a layermask
     bool IsInLayerMask(int layer, LayerMask mask)
     {
         return (mask.value & (1 << layer)) != 0;

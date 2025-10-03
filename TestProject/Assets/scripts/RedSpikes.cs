@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class TriggerPlate : MonoBehaviour
+public class RedSpikes : MonoBehaviour
 {
-    [Header("Optional UI")]
-    public TMP_Text output;                       // drag a TMP_Text if you want a message
+    [Header("Optional UI message")]
+    public TMP_Text output;                  // drag your TMP text here if you want a message
     [TextArea] public string message = "You died. Try again";
 
     void Reset()
     {
-        // make sure the collider acts as a trigger
+        // ensure this collider is set as a trigger
         var col = GetComponent<Collider2D>();
         col.isTrigger = true;
     }

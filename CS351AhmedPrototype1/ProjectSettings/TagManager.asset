@@ -44,3 +44,6 @@ TagManager:
   - name: Platforms
     uniqueID: 2359265863
     locked: 0
+  - name: Decorations
+    uniqueID: 1265757083
+    locked: 0

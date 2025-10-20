@@ -4,82 +4,86 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    //player movement speed
+    // --- Movement ---
     public float moveSpeed = 5f;
-
-    // force applied for jumping
     public float jumpForce = 10f;
 
+    // --- Ground Check ---
     public LayerMask groundLayer;
-
     public Transform groundCheck;
-
     public float groundCheckRadius = 0.2f;
 
-
-
-    // refrence to Rigid body2D
+    // --- References ---
     private Rigidbody2D rb;
+    private Animator anim;
+    private SpriteRenderer sr;
 
+    // --- State ---
     private bool isGrounded;
-
-    // a variable holds horizontal input
     private float horizontalInput;
 
-    // Start is called before the first frame update
+    // --- Optional (for later use) ---
+    private bool isShooting = false;
+    private bool isDead = false;
+
     void Start()
     {
-
-        // get values for horizontal movement
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
+        sr = GetComponent<SpriteRenderer>();
 
-        // ensure the ground check variable is assigned
         if (groundCheck == null)
         {
-            Debug.LogError("groundCheck not assigned to the player controller!!");
+            Debug.LogError("GroundCheck not assigned to the player controller!!");
         }
-
-
     }
 
-    // Update is called once per frame
     void Update()
     {
-        // get
-        horizontalInput = Input.GetAxis("Horizontal");
+        if (isDead) return; // stop control when dead
 
-        // check for jump input
+        // 1) Read movement input (-1, 0, 1)
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+
+        // 2) Jump input
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-
-
         }
 
+        // 3) Flip player direction
+        if (horizontalInput > 0.01f) sr.flipX = false;
+        else if (horizontalInput < -0.01f) sr.flipX = true;
+
+        // 4) Shooting (optional, safe placeholder)
+        // If you later add shooting logic, toggle "isShooting" true/false there
+        // Example: isShooting = Input.GetButton("Fire1");
+        anim.SetBool("IsShooting", isShooting);
+
+        // 5) Drive animator (core part)
+        anim.SetFloat("Speed", Mathf.Abs(horizontalInput));
+
+        // 6) Update grounded state visually if you want jump animations later
+        anim.SetBool("IsGrounded", isGrounded);
     }
 
     void FixedUpdate()
-
     {
-
-        // player using Rigid body2D
+        // Move using physics
         rb.velocity = new Vector2(horizontalInput * moveSpeed, rb.velocity.y);
 
+        // Ground check
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+    }
 
-        // optionally we can add animations here later
+    // 7) Safe death trigger (optional)
+    public void Die()
+    {
+        if (isDead) return;
+        isDead = true;
 
-        // ensure the player is facing the direction of movement
-
-        if (horizontalInput > 0)
-        {
-            transform.localScale = new Vector3(1f, 1f, 1f);
-        }
-        else if (horizontalInput < 0)
-        {
-            transform.localScale = new Vector3(-1f, 1f, 1f);
-        }
-
-
+        rb.velocity = Vector2.zero;
+        anim.ResetTrigger("Die");
+        anim.SetTrigger("Die");
     }
 }

@@ -38,9 +38,12 @@ public class PlatformerPlayerController : MonoBehaviour
     // An audio to play sound effects
     private AudioSource playerAudio;
 
+    private Animator animator;
+
     // Start is called before the first frame update
     void Start()
     {
+        animator = GetComponent<Animator>();
 
         // set refrence
         playerAudio = GetComponent<AudioSource>();
@@ -76,20 +79,26 @@ public class PlatformerPlayerController : MonoBehaviour
 
     }
 
-    void FixedUpdate() 
+    void FixedUpdate()
 
     {
-       
+
         // player using Rigid body2D
         rb.velocity = new Vector2(horizontalInput * moveSpeed, rb.velocity.y);
 
+        animator.SetFloat("xVelocityAbs", Mathf.Abs(rb.velocity.x));
+
+        animator.SetFloat("yVelocity", rb.velocity.y);
+
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+
+        animator.SetBool("onGround", isGrounded);
 
         // optionally we can add animations here later
 
         // ensure the player is facing the direction of movement
 
-        if(horizontalInput > 0)
+        if (horizontalInput > 0)
         {
             transform.localScale = new Vector3(1f, 1f, 1f);
         }

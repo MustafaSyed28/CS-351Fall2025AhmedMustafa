@@ -7,6 +7,7 @@ public class Projectile : MonoBehaviour
     private Rigidbody2D rb;
     public float speed = 20f;
     public int damage = 20;
+    public GameObject impactEffect;
 
     void Start()
     {
@@ -25,6 +26,8 @@ public class Projectile : MonoBehaviour
 
         if (hitInfo.gameObject.tag != "Player")
         {
+            Instantiate(impactEffect, transform.position, Quaternion.identity);
+
             Destroy(gameObject);
         }
     }

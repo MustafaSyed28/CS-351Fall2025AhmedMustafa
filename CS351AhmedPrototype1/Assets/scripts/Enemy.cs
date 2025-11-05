@@ -9,9 +9,26 @@ public class Enemy : MonoBehaviour
 
     public GameObject deathEffect;
 
+    private DisplayBar healthBar;
+
+    private void Start()
+    {
+        healthBar = GetComponentInChildren<DisplayBar>();
+
+        if (healthBar == null)
+        {
+            Debug.LogError("HealthBar (Display script) not found");
+            return;
+        }
+
+        healthBar.SetMaxValue(health);
+    }
+
     public void TakeDamage(int damage)
     {
         health -= damage;
+
+        healthBar.SetValue(health);
 
         if (health <= 0)
         {

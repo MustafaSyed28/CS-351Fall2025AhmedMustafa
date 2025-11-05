@@ -8,9 +8,15 @@ public class DisplayBar : MonoBehaviour
 {
     public Slider slider;
 
+    public Gradient gradient;
+
+    public Image fill;
+
     public void SetValue(float value)
     {
         slider.value = value;
+
+        fill.color = gradient.Evaluate(slider.normalizedValue);
     }
 
     public void SetMaxValue(float value)
@@ -18,6 +24,8 @@ public class DisplayBar : MonoBehaviour
         slider.maxValue = value;
 
         slider.value = value;
+
+        fill.color = gradient.Evaluate(1f);
     }
 
 }

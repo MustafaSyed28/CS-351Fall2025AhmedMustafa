@@ -11,6 +11,8 @@ public class Enemy : MonoBehaviour
 
     private DisplayBar healthBar;
 
+    public int damage = 10;
+
     private void Start()
     {
         healthBar = GetComponentInChildren<DisplayBar>();
@@ -22,6 +24,24 @@ public class Enemy : MonoBehaviour
         }
 
         healthBar.SetMaxValue(health);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            PlayerHealth playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
+
+            if (playerHealth == null)
+            {
+                Debug.LogError("PlayerHealth script not found on player");
+                return;
+            }
+
+            playerHealth.TakeDamage(damage);
+
+            playerHealth.Knockback(transform.position);
+        }
     }
 
     public void TakeDamage(int damage)

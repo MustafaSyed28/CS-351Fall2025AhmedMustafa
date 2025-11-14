@@ -82,8 +82,12 @@ public class PlatformerPlayerController : MonoBehaviour
     void FixedUpdate()
 
     {
+        if (!PlayerHealth.hitRecently)
+        {
+            rb.velocity = new Vector2(horizontalInput * moveSpeed, rb.velocity.y);
+        }
 
-        // player using Rigid body2D
+        // Move player using Rigid body2D
         rb.velocity = new Vector2(horizontalInput * moveSpeed, rb.velocity.y);
 
         animator.SetFloat("xVelocityAbs", Mathf.Abs(rb.velocity.x));
